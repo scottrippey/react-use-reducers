@@ -1,21 +1,23 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
 export function useReducers<TState, TReducers extends Reducers<TState>>(
-  initial: TState,
   reducers: TReducers,
+  initial: TState,
 ): readonly [ TState, ActionsFromReducers<TReducers, TState> ] {
   const [ state, setState ] = useState(initial);
+
+  const reducersRef = useRef(reducers);
+  reducersRef.current = reducers;
 
   const actions = useMemo(() => {
     // Map the "reducers" into "actions":
     return (Object.keys(reducers) as Array<keyof TReducers>).reduce((actionsResult, key) => {
-      const reducer = reducers[key];
-      const action = (...args: unknown[]) => setState(s => reducer(s, ...args));
+      const action = (...args: unknown[]) => setState(s => reducersRef.current[key](s, ...args));
 
-      actionsResult[key] = action as ActionFromReducer<typeof reducer, TState>;
+      actionsResult[key] = action as ActionFromReducer<TReducers[typeof key], TState>;
       return actionsResult;
     }, {} as ActionsFromReducers<TReducers, TState>);
-  }, [ reducers ]);
+  }, []);
 
   return [ state, actions ] as const;
 }

@@ -15,7 +15,7 @@ describe('useReducers', () => {
 
   function renderTestHook() {
     return renderHook(() => {
-      const [ state, actions ] = useReducers(INITIAL, ACTIONS);
+      const [ state, actions ] = useReducers(ACTIONS, INITIAL);
       return { state, actions };
     });
   }
@@ -92,5 +92,49 @@ describe('useReducers', () => {
         "counter2": 20,
       }
     `);
+  });
+
+  it('reducers can be inline; actions will be memoized', () => {
+    const { result, rerender } = renderHook((props: { howMany: number }) => {
+      const [ state, actions ] = useReducers({
+        skipAFew: (s) => ({ ...s, counter1: s.counter1 + props.howMany })
+      }, INITIAL);
+      return { state, actions };
+    }, { initialProps: { howMany: 1 } });
+
+    expect(result.current.state).toEqual(INITIAL);
+
+    const skipAFewReference = result.current.actions.skipAFew;
+
+    act(() => {
+      result.current.actions.skipAFew();
+    });
+    expect(result.current.state).toMatchInlineSnapshot(`
+      Object {
+        "counter1": 1,
+        "counter2": 0,
+      }
+    `);
+
+    rerender({ howMany: 99 });
+    expect(result.current.state).toMatchInlineSnapshot(`
+      Object {
+        "counter1": 1,
+        "counter2": 0,
+      }
+    `);
+
+    act(() => {
+      result.current.actions.skipAFew();
+    });
+    expect(result.current.state).toMatchInlineSnapshot(`
+      Object {
+        "counter1": 100,
+        "counter2": 0,
+      }
+    `);
+
+    // Ensure the actions keep the same reference always:
+    expect(skipAFewReference).toBe(result.current.actions.skipAFew);
   });
 });
