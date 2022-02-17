@@ -1,19 +1,28 @@
 {
   "name": "react-use-reducers",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "",
-  "main": "src/use-reducers.js",
+  "main": "dist/use-reducers.js",
   "scripts": {
-    "test": "jest"
+    "checks": "npm run test && npm run type-check",
+    "type-check": "tsc --noEmit",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "build": "npm run build:clean && tsc",
+    "build:clean": "rimraf dist",
+    "build:watch": "tsc --watch",
+    "prepublishOnly": "npm run test && npm run build",
+    "preversion": "npm run test && npm run build"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": ["react", "reducer", "state-management"],
+  "author": "scottrippey",
+  "license": "MIT",
   "devDependencies": {
     "@testing-library/react-hooks": "^7.0.2",
     "@types/jest": "^27.4.0",
     "jest": "^27.5.1",
     "react-test-renderer": "^17.0.2",
+    "rimraf": "^3.0.2",
     "ts-jest": "^27.1.3",
     "ts-node": "^10.5.0",
     "typescript": "^4.5.5"
