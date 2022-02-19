@@ -7,7 +7,7 @@ describe('useReducers', () => {
     counter2: 0,
   };
   type TState = typeof INITIAL;
-  const ACTIONS = {
+  const REDUCERS = {
     reset: () => INITIAL,
     inc1: (s: TState, inc = 1) => ({ ...s, counter1: s.counter1 + inc }),
     inc2: (s: TState, inc = 1) => ({ ...s, counter2: s.counter2 + inc })
@@ -15,10 +15,22 @@ describe('useReducers', () => {
 
   function renderTestHook() {
     return renderHook(() => {
-      const [ state, actions ] = useReducers(ACTIONS, INITIAL);
+      const [ state, actions ] = useReducers(REDUCERS, INITIAL);
       return { state, actions };
     });
   }
+
+  describe('initial param', () => {
+    it('can be a constant value', () => {
+      const { result } = renderHook(() => useReducers(REDUCERS, ({ counter1: 5, counter2: 5 })))
+      expect(result.current[0]).toEqual({ counter1: 5, counter2: 5 })
+    });
+
+    it('can be a callback function', () => {
+      const { result } = renderHook(() => useReducers(REDUCERS, () => ({ counter1: 5, counter2: 5 })))
+      expect(result.current[0]).toEqual({ counter1: 5, counter2: 5 })
+    });
+  });
 
   it('should return the state and mapped actions', () => {
     const { result } = renderTestHook();
@@ -83,7 +95,6 @@ describe('useReducers', () => {
       result.current.actions.inc1(5);
       result.current.actions.inc1(10);
       result.current.actions.inc2(20);
-
     });
 
     expect(result.current.state).toMatchInlineSnapshot(`

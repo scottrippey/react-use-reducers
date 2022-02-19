@@ -2,15 +2,17 @@ import { useMemo, useRef, useState } from 'react';
 
 export function useReducers<TState, TReducers extends Reducers<TState>>(
   reducers: TReducers,
-  initial: TState,
+  initial: (() => TState) | TState,
 ): readonly [ TState, ActionsFromReducers<TReducers, TState> ] {
+  // It feels wrong to use `useState` instead of `useReducer`, but it gives us exactly what we need, so...
   const [ state, setState ] = useState(initial);
 
+  // Hold the reducers in a ref, so that our actions can be memoized:
   const reducersRef = useRef(reducers);
   reducersRef.current = reducers;
 
+  // Map the "reducers" into "actions":
   const actions = useMemo(() => {
-    // Map the "reducers" into "actions":
     return (Object.keys(reducers) as Array<keyof TReducers>).reduce((actionsResult, key) => {
       const action = (...args: unknown[]) => setState(s => reducersRef.current[key](s, ...args));
 
