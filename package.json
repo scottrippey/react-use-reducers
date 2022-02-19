@@ -1,6 +1,6 @@
 {
   "name": "react-use-reducers",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "",
   "main": "dist/use-reducers.js",
   "scripts": {
@@ -14,7 +14,11 @@
     "prepublishOnly": "npm run test && npm run build",
     "preversion": "npm run test && npm run build"
   },
-  "keywords": ["react", "reducer", "state-management"],
+  "keywords": [
+    "react",
+    "reducer",
+    "state-management"
+  ],
   "author": "scottrippey",
   "license": "MIT",
   "devDependencies": {
